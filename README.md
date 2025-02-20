@@ -111,8 +111,16 @@ The project follows best practices for React/TypeScript applications:
 
 ## Testing
 
+The project includes several types of tests:
 - Unit tests for alert rules
-- WebSocket connection tests
 - Component rendering tests
-- State management tests
-- Alert system integration tests
+- Performance tests for data handling
+
+Run tests with:
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+```
