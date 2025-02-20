@@ -256,6 +256,23 @@ const AlertsPage: React.FC = () => {
         </Button>
       </Box>
 
+      <Box 
+        sx={{ 
+          padding: 2, 
+          marginBottom: 3, 
+          backgroundColor: 'warning.main', 
+          borderRadius: 1,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1
+        }}
+      >
+        <Typography variant="body1" color="warning.contrastText">
+          ⚠️ Default alert thresholds may not show many alerts in current market conditions. 
+          Click "Configure Thresholds" to adjust values for better monitoring.
+        </Typography>
+      </Box>
+
       <AlertTable
         title="Cheap Orders"
         alerts={alerts.cheap}

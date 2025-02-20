@@ -54,6 +54,8 @@ npm run build
 - 60-second alert history retention
 - All alerts visible (not limited to 500 orders display)
 
+> ⚠️ **IMPORTANT NOTE**: The default alert thresholds might not trigger alerts frequently enough in current market conditions. It is strongly recommended to adjust these values in the Settings dialog to match your monitoring needs. For example, you might want to lower the "Cheap order" threshold or decrease the "Solid order" BTC amount.
+
 ### 3. Advanced Features
 
 #### WebSocket Connection Management
