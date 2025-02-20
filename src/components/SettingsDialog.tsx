@@ -102,7 +102,14 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose })
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog 
+      open={open} 
+      onClose={onClose}
+      disableEnforceFocus
+      disableRestoreFocus
+      maxWidth="sm" 
+      fullWidth
+    >
       <DialogTitle>
         Alert Thresholds Configuration
       </DialogTitle>

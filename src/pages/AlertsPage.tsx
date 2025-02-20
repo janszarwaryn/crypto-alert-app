@@ -11,7 +11,8 @@ import {
   Paper,
   useTheme,
   alpha,
-  Button
+  Button,
+  Dialog
 } from '@mui/material';
 import { StreamContext } from '../context/StreamContext';
 import { useSettings } from '../context/SettingsContext';

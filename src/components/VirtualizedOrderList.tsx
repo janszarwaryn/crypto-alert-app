@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useMemo } from 'react';
 import { AutoSizer, List, ListRowProps } from 'react-virtualized';
 import { Order } from '../types';
-import { TableCell, TableRow, styled, alpha } from '@mui/material';
+import { styled, alpha } from '@mui/material';
 
 interface VirtualizedOrderListProps {
   orders: Order[];
@@ -11,7 +11,6 @@ interface VirtualizedOrderListProps {
 const ListContainer = styled('div')(({ theme }) => ({
   height: '100%',
   width: '100%',
-  overflow: 'hidden',
   '& *::-webkit-scrollbar': {
     width: '8px',
     height: '8px',
@@ -31,7 +30,6 @@ const ListContainer = styled('div')(({ theme }) => ({
   '& *::-webkit-scrollbar-corner': {
     backgroundColor: 'transparent',
   },
-  // Firefox scrollbar styling
   scrollbarWidth: 'thin',
   scrollbarColor: `${alpha(theme.palette.primary.main, 0.3)} ${alpha(theme.palette.primary.main, 0.1)}`,
 }));
@@ -56,24 +54,28 @@ const StyledList = styled(List)(({ theme }) => ({
   '&::-webkit-scrollbar-corner': {
     backgroundColor: 'transparent',
   },
-  // Firefox scrollbar styling
   scrollbarWidth: 'thin',
   scrollbarColor: `${alpha(theme.palette.primary.main, 0.3)} ${alpha(theme.palette.primary.main, 0.1)}`,
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
+const OrderRowContainer = styled('div')(({ theme }) => ({
+  display: 'table-row',
+  width: '100%',
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
   },
   '&:hover': {
     backgroundColor: theme.palette.action.selected,
   },
-  display: 'table',
-  width: '100%',
-  tableLayout: 'fixed',
 }));
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
+const Cell = styled('div')(({ theme }) => ({
+  display: 'table-cell',
+  padding: theme.spacing(1.5),
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  borderBottom: `1px solid ${theme.palette.divider}`,
   '&.time-column': {
     width: '140px',
   },
@@ -82,17 +84,25 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
   '&.price-column': {
     width: '120px',
+    textAlign: 'right',
   },
   '&.amount-column': {
     width: '160px',
+    textAlign: 'right',
   },
   '&.total-column': {
     width: '120px',
+    textAlign: 'right',
+    paddingRight: theme.spacing(3),
   },
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
 }));
+
+const TableContainer = styled('div')({
+  display: 'table',
+  width: '100%',
+  tableLayout: 'fixed',
+  borderCollapse: 'collapse',
+});
 
 const formatPrice = (price: number): string => 
   price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -115,23 +125,25 @@ const OrderRow = memo(({ order, style }: { order: Order; style: React.CSSPropert
   const formattedTime = useMemo(() => formatTime(order.timestamp), [order.timestamp]);
   
   return (
-    <StyledTableRow style={{ ...style, width: '100%' }}>
-      <StyledTableCell className="time-column">
-        {formattedTime}
-      </StyledTableCell>
-      <StyledTableCell className="type-column">
-        {order.type.toUpperCase()}
-      </StyledTableCell>
-      <StyledTableCell className="price-column" align="right">
-        ${formattedPrice}
-      </StyledTableCell>
-      <StyledTableCell className="amount-column" align="right">
-        {formattedBTC}
-      </StyledTableCell>
-      <StyledTableCell className="total-column" align="right">
-        ${formattedUSD}
-      </StyledTableCell>
-    </StyledTableRow>
+    <TableContainer style={style}>
+      <OrderRowContainer>
+        <Cell className="time-column">
+          {formattedTime}
+        </Cell>
+        <Cell className="type-column">
+          {order.type.toUpperCase()}
+        </Cell>
+        <Cell className="price-column">
+          ${formattedPrice}
+        </Cell>
+        <Cell className="amount-column">
+          {formattedBTC}
+        </Cell>
+        <Cell className="total-column">
+          ${formattedUSD}
+        </Cell>
+      </OrderRowContainer>
+    </TableContainer>
   );
 });
 
@@ -168,4 +180,4 @@ const VirtualizedOrderList: React.FC<VirtualizedOrderListProps> = memo(({ orders
 
 VirtualizedOrderList.displayName = 'VirtualizedOrderList';
 
-export default VirtualizedOrderList; 
+export default VirtualizedOrderList;
