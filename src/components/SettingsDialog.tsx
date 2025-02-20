@@ -50,41 +50,51 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose })
   };
 
   const handleSave = () => {
-    // Ensure all values are numbers before saving
-    const finalSettings = {
-      cheapThreshold: typeof localSettings.cheapThreshold === 'string' 
-        ? parseFloat(localSettings.cheapThreshold) || DEFAULT_SETTINGS.cheapThreshold 
-        : localSettings.cheapThreshold,
-      solidThreshold: typeof localSettings.solidThreshold === 'string'
-        ? parseFloat(localSettings.solidThreshold) || DEFAULT_SETTINGS.solidThreshold
-        : localSettings.solidThreshold,
-      bigThreshold: typeof localSettings.bigThreshold === 'string'
-        ? parseFloat(localSettings.bigThreshold) || DEFAULT_SETTINGS.bigThreshold
-        : localSettings.bigThreshold,
-      apiKey: localSettings.apiKey // Keep current API key
-    };
-    
-    // Update settings in context
-    updateSettings(finalSettings);
-    
-    // Close dialog immediately
-    onClose();
-
-    // Show settings updated message
+    // Show settings update message
     setConnectionStatus({
       isLoading: true,
-      status: 'Live',
-      substatus: 'Real-time trade data stream is now active'
+      status: 'Updating',
+      substatus: 'Applying new settings...'
     });
 
-    // Hide overlay after delay
+    // Delay settings update to allow for UI feedback
     setTimeout(() => {
+      // Ensure all values are numbers before saving
+      const finalSettings = {
+        cheapThreshold: typeof localSettings.cheapThreshold === 'string' 
+          ? parseFloat(localSettings.cheapThreshold) || DEFAULT_SETTINGS.cheapThreshold 
+          : localSettings.cheapThreshold,
+        solidThreshold: typeof localSettings.solidThreshold === 'string'
+          ? parseFloat(localSettings.solidThreshold) || DEFAULT_SETTINGS.solidThreshold
+          : localSettings.solidThreshold,
+        bigThreshold: typeof localSettings.bigThreshold === 'string'
+          ? parseFloat(localSettings.bigThreshold) || DEFAULT_SETTINGS.bigThreshold
+          : localSettings.bigThreshold,
+        apiKey: localSettings.apiKey
+      };
+      
+      // Update settings in context
+      updateSettings(finalSettings);
+      
+      // Show settings updated message
       setConnectionStatus({
-        isLoading: false,
-        status: 'Live',
-        substatus: 'Real-time trade data stream is now active'
+        isLoading: true,
+        status: 'Reconnecting',
+        substatus: 'Applying new alert thresholds...'
       });
-    }, 1000);
+
+      // Allow time for WebSocket to stabilize
+      setTimeout(() => {
+        setConnectionStatus({
+          isLoading: false,
+          status: 'Live',
+          substatus: 'Real-time trade data stream is now active'
+        });
+      }, 10000); // 10 seconds delay for WebSocket stabilization
+    }, 2000); // 2 seconds delay before applying settings
+
+    // Close dialog immediately for better UX
+    onClose();
   };
 
   const handleReset = () => {

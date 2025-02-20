@@ -3,13 +3,14 @@ import { StreamContext } from '../context/StreamContext';
 import { cryptoService } from '../services/cryptoService';
 import { processOrderForAlerts } from '../utils/alertRules';
 import { useSettings } from '../context/SettingsContext';
+import { ConnectionStatusType } from '../types';
 
 const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void => {
-  const { startStream, stopStream, addOrder, addAlerts, setConnectionStatus } = useContext(StreamContext);
+  const { startStream, stopStream, addOrder, addAlert, setConnectionStatus } = useContext(StreamContext);
   const { settings } = useSettings();
 
   useEffect(() => {
-    cryptoService.onConnection((status, substatus) => {
+    cryptoService.onConnection((status: ConnectionStatusType, substatus?: string) => {
       setConnectionStatus({
         isLoading: showLoading,
         status,
@@ -29,9 +30,9 @@ const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void =
         addOrder(order);
 
         const alerts = processOrderForAlerts(order, settings);
-        if (alerts.cheap) addAlerts('cheap', alerts.cheap);
-        if (alerts.solid) addAlerts('solid', alerts.solid);
-        if (alerts.big) addAlerts('big', alerts.big);
+        if (alerts.cheap) addAlert('cheap', alerts.cheap);
+        if (alerts.solid) addAlert('solid', alerts.solid);
+        if (alerts.big) addAlert('big', alerts.big);
       });
       cryptoService.startStream();
     } else {
@@ -52,7 +53,7 @@ const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void =
         substatus: 'Stream has been stopped'
       });
     };
-  }, [isActive, showLoading, startStream, stopStream, addOrder, addAlerts, settings, setConnectionStatus]);
+  }, [isActive, showLoading, startStream, stopStream, addOrder, addAlert, settings, setConnectionStatus]);
 };
 
 export { useCryptoStream as default };

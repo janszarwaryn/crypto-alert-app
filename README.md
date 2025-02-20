@@ -1,12 +1,12 @@
-Crypto Alerts
+# Crypto Alerts Dashboard
 
-Real-time Bitcoin trading monitor with alerts system.
+Real-time Bitcoin trading monitor with advanced alerts system for Binance trades.
 
 ## Requirements
 
 - Node.js v18+
 - npm v9+
-- CryptoCompare API key
+- CryptoCompare API key (with r_price_poll_basic and r_price_stream_basic rights)
 
 ## Setup
 
@@ -33,45 +33,82 @@ npm test
 npm run build
 ```
 
-## Features
+## Core Features
 
-### Required Features
-1. **Real-time Monitoring**
-   - Live BTC/USDT trades from Binance
-   - WebSocket connection
-   - Start/Stop control
+### 1. Monitor Page
+- Real-time BTC/USDT trade monitoring from Binance
+- Terminal-style display with monospaced font
+- Latest 500 orders with newest at top
+- Human-readable data formatting
+- Highlighted alerts based on configurable thresholds
+- Persistent data display after stream stop
 
-2. **Alert System**
-   - Cheap Orders (< $50,000)
-   - Solid Orders (> 10 BTC)
-   - Big Business (> $1M)
-   - 60-second alert history
-   - Settings options to change filterts to [50,000, 10 BTC, $1M]
+### 2. Alerts Page
+- Wall monitor-ready display for trading centers
+- Three alert categories with configurable thresholds:
+  - "Cheap order" (default: < $50,000)
+  - "Solid order" (default: > 10 BTC)
+  - "Big biznis here" (default: > $1M total value)
+- Real-time alert counters
+- Detailed alert lists with price, quantity, and total value
+- 60-second alert history retention
+- All alerts visible (not limited to 500 orders display)
 
-### Additional Features
-1. **Alert Enhancements**
-   - Visual indicators for each alert type
-   - Alert messages with detailed information
-   - Automatic alert cleanup after 60 seconds
-   - Price formatting in BTC and USD
+### 3. Advanced Features
 
-2. **Testing**
-   - Unit tests for alert rules
-   - Integration tests for WebSocket
-   - Alert generation tests
+#### WebSocket Connection Management
+- Real-time connection status indicator
+- Automatic reconnection handling
+- Connection state messages:
+  - Initializing
+  - Connecting
+  - Live
+  - Disconnected
+  - Reconnecting
+- Smart reconnection delays for stability
 
-3. **Performance**
-   - Message buffering
-   - 500 orders limit
-   - Efficient state updates
+#### Alert System Enhancements
+- Configurable alert thresholds via settings dialog
+- Visual feedback during settings changes
+- Stabilization period after threshold updates
+- Real-time threshold validation
+- Persistent settings storage
 
-4. **Error Handling**
-   - Auto-reconnection for WebSocket
-   - Data validation
-   - Connection status monitoring
+#### Performance Optimizations
+- Virtual scrolling for order list
+- Efficient order caching system
+- Smart data structure management
+- Memory usage optimization
+- Automatic cleanup for expired alerts
 
-5. **UI**
-   - Material-UI components
-   - Dark mode theme
-   - Responsive layout
-   - Loading states with status info
+#### User Interface
+- Material-UI components for modern look
+- Responsive design for all screen sizes
+- Dark mode theme
+- Clear status indicators
+- Intuitive navigation
+- Settings configuration dialog
+
+#### Error Handling
+- Comprehensive WebSocket error management
+- Data validation and sanitization
+- User-friendly error messages
+- Automatic error recovery
+- Network status monitoring
+
+## Project Structure
+
+The project follows best practices for React/TypeScript applications:
+- Context-based state management
+- Custom hooks for business logic
+- Component-based architecture
+- Type safety with TypeScript
+- Efficient real-time data handling
+
+## Testing
+
+- Unit tests for alert rules
+- WebSocket connection tests
+- Component rendering tests
+- State management tests
+- Alert system integration tests

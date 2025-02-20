@@ -15,7 +15,6 @@ import {
 } from '@mui/material';
 import { StreamContext } from '../context/StreamContext';
 import { useSettings } from '../context/SettingsContext';
-import { format } from 'date-fns';
 import { Order } from '../types';
 import { SettingsDialog } from '../components/SettingsDialog';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -25,6 +24,20 @@ const ALERT_COLORS = {
   SOLID: '#4caf50',
   BIG: '#2196f3'
 };
+
+const formatTime = (date: Date): string => {
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  const milliseconds = date.getMilliseconds().toString().padStart(3, '0');
+  return `${hours}:${minutes}:${seconds}.${milliseconds}`;
+};
+
+const formatPrice = (price: number): string => 
+  price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const formatBTC = (amount: number): string =>
+  amount.toLocaleString(undefined, { minimumFractionDigits: 8, maximumFractionDigits: 8 });
 
 interface AlertTableProps {
   title: string;
@@ -135,6 +148,8 @@ const AlertTable: React.FC<AlertTableProps> = ({
                   fontWeight: 'bold',
                   color: alpha(theme.palette.text.primary, 0.95),
                   borderBottom: `2px solid ${alpha(color, 0.3)}`,
+                  width: '160px',
+                  minWidth: '160px',
                 }}
               >
                 Time
@@ -146,6 +161,8 @@ const AlertTable: React.FC<AlertTableProps> = ({
                   fontWeight: 'bold',
                   color: alpha(theme.palette.text.primary, 0.95),
                   borderBottom: `2px solid ${alpha(color, 0.3)}`,
+                  width: '100px',
+                  minWidth: '100px',
                 }}
               >
                 Type
@@ -158,6 +175,8 @@ const AlertTable: React.FC<AlertTableProps> = ({
                   fontWeight: 'bold',
                   color: alpha(theme.palette.text.primary, 0.95),
                   borderBottom: `2px solid ${alpha(color, 0.3)}`,
+                  width: '140px',
+                  minWidth: '140px',
                 }}
               >
                 Price
@@ -170,9 +189,11 @@ const AlertTable: React.FC<AlertTableProps> = ({
                   fontWeight: 'bold',
                   color: alpha(theme.palette.text.primary, 0.95),
                   borderBottom: `2px solid ${alpha(color, 0.3)}`,
+                  width: '180px',
+                  minWidth: '180px',
                 }}
               >
-                Quantity
+                Amount (BTC)
               </TableCell>
               <TableCell
                 align="right"
@@ -182,32 +203,30 @@ const AlertTable: React.FC<AlertTableProps> = ({
                   fontWeight: 'bold',
                   color: alpha(theme.palette.text.primary, 0.95),
                   borderBottom: `2px solid ${alpha(color, 0.3)}`,
+                  width: '160px',
+                  minWidth: '160px',
                 }}
               >
-                Total
+                Total (USD)
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredAlerts.map((alert, index) => (
               <TableRow
-                key={`${alert.timestamp.getTime()}-${alert.price}-${alert.quantity}-${index}`}
-                className="animate-slide-in opacity-0"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                key={index}
+                sx={{
+                  backgroundColor: alpha(color, index % 2 === 0 ? 0.03 : 0.05),
+                  '&:hover': {
+                    backgroundColor: alpha(color, 0.1),
+                  },
+                }}
               >
-                <TableCell component="th" scope="row">
-                  {format(alert.timestamp, 'HH:mm:ss')}
-                </TableCell>
+                <TableCell>{formatTime(alert.timestamp)}</TableCell>
                 <TableCell>{alert.type.toUpperCase()}</TableCell>
-                <TableCell align="right">
-                  ${alert.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </TableCell>
-                <TableCell align="right">
-                  {alert.btcValue.toLocaleString(undefined, { minimumFractionDigits: 8, maximumFractionDigits: 8 })}
-                </TableCell>
-                <TableCell align="right">
-                  ${alert.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </TableCell>
+                <TableCell align="right">${formatPrice(alert.price)}</TableCell>
+                <TableCell align="right">{formatBTC(alert.btcValue)}</TableCell>
+                <TableCell align="right">${formatPrice(alert.usdValue)}</TableCell>
               </TableRow>
             ))}
           </TableBody>

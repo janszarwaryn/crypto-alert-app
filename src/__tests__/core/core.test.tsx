@@ -11,7 +11,8 @@ describe('Core Application Tests', () => {
     const settings = {
       cheapThreshold: 50000,
       solidThreshold: 10,
-      bigThreshold: 1000000
+      bigThreshold: 1000000,
+      apiKey: 'test-api-key'
     };
 
     test('should correctly identify alerts based on thresholds', () => {

@@ -1,74 +1,74 @@
 import React, { useContext } from 'react';
-import { Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Box, Typography, Paper, Table, TableHead, TableRow, TableCell, styled } from '@mui/material';
 import { StreamContext } from '../context/StreamContext';
-import { Order } from '../types';
+import VirtualizedOrderList from '../components/VirtualizedOrderList';
+import CacheStats from '../components/CacheStats';
+
+const TableContainer = styled(Paper)(({ theme }) => ({
+  height: 'calc(100vh - 180px)',
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+}));
+
+const TableHeader = styled(TableHead)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  position: 'sticky',
+  top: 0,
+  zIndex: 1,
+  width: '100%',
+}));
+
+const StyledTable = styled(Table)(({ theme }) => ({
+  width: '100%',
+  tableLayout: 'fixed',
+}));
+
+const HeaderCell = styled(TableCell)(({ theme }) => ({
+  backgroundColor: theme.palette.background.paper,
+  fontWeight: 'bold',
+  '&.time-column': {
+    width: '140px',
+  },
+  '&.type-column': {
+    width: '80px',
+  },
+  '&.price-column': {
+    width: '120px',
+  },
+  '&.amount-column': {
+    width: '160px',
+  },
+  '&.total-column': {
+    width: '120px',
+  },
+}));
 
 const MonitorPage: React.FC = () => {
   const { orders } = useContext(StreamContext);
 
-  const getAlertType = (order: Order) => {
-    if (order.usdValue > 1_000_000) return 'big';
-    if (order.btcValue > 10) return 'solid';
-    if (order.usdValue < 50_000) return 'cheap';
-    return null;
-  };
-
-  const getAlertColor = (order: Order) => {
-    const type = getAlertType(order);
-    switch (type) {
-      case 'big': return '#2196f3';
-      case 'solid': return '#4caf50';
-      case 'cheap': return '#ff9800';
-      default: return 'inherit';
-    }
-  };
-
   return (
     <Box sx={{ padding: 2 }}>
       <Typography variant="h5" sx={{ marginBottom: 2 }}>
-        Orders Feed (500)
+        Orders Feed ({orders.length}/500)
       </Typography>
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
+      <CacheStats />
+      <TableContainer>
+        <StyledTable size="small">
+          <TableHeader>
             <TableRow>
-              <TableCell>Time</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell align="right">Price</TableCell>
-              <TableCell align="right">Amount (BTC)</TableCell>
-              <TableCell align="right">Total (USD)</TableCell>
+              <HeaderCell className="time-column">Time</HeaderCell>
+              <HeaderCell className="type-column">Type</HeaderCell>
+              <HeaderCell className="price-column" align="right">Price</HeaderCell>
+              <HeaderCell className="amount-column" align="right">Amount (BTC)</HeaderCell>
+              <HeaderCell className="total-column" align="right">Total (USD)</HeaderCell>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {orders.map((order, index) => (
-              <TableRow
-                key={`${order.timestamp.getTime()}-${index}`}
-                sx={{
-                  color: getAlertColor(order),
-                  '& > td': {
-                    color: getAlertColor(order)
-                  }
-                }}
-              >
-                <TableCell>
-                  {order.timestamp.toLocaleTimeString()}
-                </TableCell>
-                <TableCell>
-                  {order.type.toUpperCase()}
-                </TableCell>
-                <TableCell align="right">
-                  ${order.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </TableCell>
-                <TableCell align="right">
-                  {order.btcValue.toLocaleString(undefined, { minimumFractionDigits: 8, maximumFractionDigits: 8 })}
-                </TableCell>
-                <TableCell align="right">
-                  ${order.usdValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+          </TableHeader>
+        </StyledTable>
+        <Box sx={{ flex: 1, overflow: 'hidden' }}>
+          <VirtualizedOrderList orders={orders} />
+        </Box>
       </TableContainer>
     </Box>
   );
