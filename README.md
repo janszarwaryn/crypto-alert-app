@@ -2,6 +2,8 @@
 
 Real-time Bitcoin trading monitor with advanced alerts system for Binance trades.
 
+LINK: https://crypto-alert-app-pi.vercel.app/monitor
+
 ## Requirements
 
 - Node.js v18+
