@@ -14,12 +14,12 @@ export const processOrderForAlerts = (
   order: Order,
   settings: Settings
 ): AlertResults => {
-  // Memoizujemy wartości progowe
+  // Cache threshold values for better performance
   const cheapThreshold = settings.cheapThreshold;
   const solidThreshold = settings.solidThreshold;
   const bigThreshold = settings.bigThreshold;
 
-  // Obliczamy wartości tylko raz
+  // Calculate values once to avoid repeating
   const usdValue = order.usdValue;
   const btcValue = order.btcValue;
   const price = order.price;
@@ -30,7 +30,7 @@ export const processOrderForAlerts = (
     big: null
   };
 
-  // Używamy price dla cheap orders (nie total value)
+  // Check price for cheap orders (not total value)
   if (price < cheapThreshold) {
     alerts.cheap = {
       id: `cheap-${Date.now()}-${Math.random()}`,
@@ -45,6 +45,7 @@ export const processOrderForAlerts = (
     };
   }
 
+  // Check if order is bigger then solid threshold
   if (btcValue > solidThreshold) {
     alerts.solid = {
       id: `solid-${Date.now()}-${Math.random()}`,
@@ -59,6 +60,7 @@ export const processOrderForAlerts = (
     };
   }
 
+  // Check if its a big business order
   if (usdValue > bigThreshold) {
     alerts.big = {
       id: `big-${Date.now()}-${Math.random()}`,

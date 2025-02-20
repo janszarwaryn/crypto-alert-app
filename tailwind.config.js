@@ -17,5 +17,5 @@ module.exports = {
     },
   },
   plugins: [],
-  important: true, // This ensures Tailwind classes override MUI styles
+  important: true,
 }

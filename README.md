@@ -1,4 +1,4 @@
-e# Crypto Alerts
+Crypto Alerts
 
 Real-time Bitcoin trading monitor with alerts system.
 

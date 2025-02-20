@@ -5,7 +5,7 @@ export interface Order {
   usdValue: number;
   btcValue: number;
   type: 'buy' | 'sell';
-  total?: number;  // Opcjonalne pole total
+  total?: number;
 }
 
 export interface Alert {
@@ -17,7 +17,7 @@ export interface Alert {
   btcValue: number;
   type: 'buy' | 'sell';
   category: 'cheap' | 'solid' | 'big';
-  alertMessage?: string;  // Opcjonalne pole alertMessage
+  alertMessage?: string;
 }
 
 export interface Settings {

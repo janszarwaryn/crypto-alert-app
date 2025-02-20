@@ -9,7 +9,6 @@ const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void =
   const { settings } = useSettings();
 
   useEffect(() => {
-    // Ustaw callback dla aktualizacji stanu połączenia
     cryptoService.onConnection((status, substatus) => {
       setConnectionStatus({
         isLoading: showLoading,
@@ -19,7 +18,6 @@ const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void =
     });
 
     if (isActive) {
-      // Pokaż LoadingOverlay podczas inicjalizacji
       setConnectionStatus({
         isLoading: showLoading,
         status: 'Initializing',
@@ -28,10 +26,8 @@ const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void =
 
       startStream();
       cryptoService.subscribe((order) => {
-        // Dodaj zamówienie do listy
         addOrder(order);
 
-        // Sprawdź czy zamówienie generuje alerty
         const alerts = processOrderForAlerts(order, settings);
         if (alerts.cheap) addAlerts('cheap', alerts.cheap);
         if (alerts.solid) addAlerts('solid', alerts.solid);
@@ -41,7 +37,6 @@ const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void =
     } else {
       stopStream();
       cryptoService.stopStream();
-      // Wyłącz LoadingOverlay przy zatrzymaniu streama
       setConnectionStatus({
         isLoading: false,
         status: 'Disconnected',
@@ -51,7 +46,6 @@ const useCryptoStream = (isActive: boolean, showLoading: boolean = true): void =
 
     return () => {
       cryptoService.stopStream();
-      // Wyłącz LoadingOverlay przy odmontowaniu komponentu
       setConnectionStatus({
         isLoading: false,
         status: 'Disconnected',

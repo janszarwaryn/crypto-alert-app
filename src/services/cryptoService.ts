@@ -1,11 +1,11 @@
 import { Order } from '../types';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-// Constants
+// API config
 const WEBSOCKET_URL = 'wss://streamer.cryptocompare.com/v2?api_key=';
 const API_KEY = process.env.REACT_APP_CRYPTO_API_KEY || '';
 
-// Types
+// Type definitions for WebSocket messages and callbacks
 type MessageListener = (order: Order) => void;
 type WebSocketMessageType = '20' | '16' | '3' | '8' | '401' | '429' | '500' | '999' | '0';
 type ConnectionCallback = (status: string, substatus?: string, showLoading?: boolean) => void;
@@ -49,8 +49,8 @@ export class CryptoService {
     this.setupWebSocket = this.setupWebSocket.bind(this);
     this.cleanup = this.cleanup.bind(this);
     this.subscribe = this.subscribe.bind(this);
-    
-    // Nasłuchuj na zdarzenia online/offline
+
+    // Listen for network status changes
     window.addEventListener('online', this.handleOnline.bind(this));
     window.addEventListener('offline', this.handleOffline.bind(this));
   }
@@ -68,12 +68,12 @@ export class CryptoService {
   }
 
   private reconnectWithDelay() {
-    // Anuluj poprzedni timer jeśli istnieje
+    // Cancel existing reconnect timer
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
     }
 
-    // Czekaj 5 sekund przed ponowną próbą
+    // Wait before attempting reconnection
     this.reconnectTimer = setTimeout(() => {
       if (this.isActive) {
         console.log('Attempting to reconnect...');
@@ -83,6 +83,7 @@ export class CryptoService {
   }
 
   private updateConnectionStatus(status: string, substatus: string, showLoading: boolean) {
+    // Only show overlay if not manually closed or if its an error
     if (this.onConnectionUpdate && (!this.overlayManuallyClosed || status === 'Error')) {
       this.onConnectionUpdate(status, substatus, showLoading);
     }
@@ -99,7 +100,8 @@ export class CryptoService {
     this.updateConnectionStatus('Initializing', 'Setting up WebSocket connection...', true);
 
     const wsUrl = `${WEBSOCKET_URL}${API_KEY}`;
-    
+
+    // Initialize WebSocket with reconnection settings
     this.ws = new ReconnectingWebSocket(wsUrl, [], {
       maxRetries: 5,
       connectionTimeout: 30000,
@@ -124,8 +126,9 @@ export class CryptoService {
     this.ws.onmessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data) as WebSocketMessage;
-        
+
         if (data.TYPE === '0') {
+          // Create order object from received data
           const order: Order = {
             price: data.P || 0,
             quantity: data.Q || 0,
@@ -137,13 +140,15 @@ export class CryptoService {
 
           this.subscribers.forEach(callback => callback(order));
 
+          // Handle first successful message
           if (!this.isSubscribed) {
             this.isSubscribed = true;
             this.pendingSubscription = false;
-            
+
             if (!this.overlayManuallyClosed) {
               this.updateConnectionStatus('Live', 'Real-time trade data stream is now active', true);
-              
+
+              // Auto-hide overlay after delay
               setTimeout(() => {
                 if (this.isActive && !this.overlayManuallyClosed) {
                   this.updateConnectionStatus('Live', 'Real-time trade data stream is now active', false);
@@ -152,6 +157,7 @@ export class CryptoService {
             }
           }
         } else if (data.TYPE === '500' || data.TYPE === '401' || data.TYPE === '429') {
+          // Handle API errors
           console.error('WebSocket error:', data.MESSAGE);
           this.overlayManuallyClosed = false;
           this.updateConnectionStatus('Error', `API Error: ${data.MESSAGE}. Attempting to reconnect...`, true);
@@ -183,7 +189,7 @@ export class CryptoService {
       }
     };
 
-    // ReconnectingWebSocket automatycznie otwiera połączenie przy utworzeniu
+    // ReconnectingWebSocket opens connection automatically
     console.log('WebSocket instance created, waiting for connection...');
   }
 
@@ -192,7 +198,7 @@ export class CryptoService {
       return;
     }
 
-    // Dodatkowe sprawdzenie stanu połączenia
+    // Check if connection is ready
     if (this.ws.readyState !== WebSocket.OPEN) {
       console.log('WebSocket not ready for subscription, current state:', this.ws.readyState);
       return;
@@ -200,7 +206,7 @@ export class CryptoService {
 
     this.pendingSubscription = true;
     console.log('Sending subscription request...');
-    
+
     if (this.onConnectionUpdate) {
       this.onConnectionUpdate('Connected', 'Subscribing to BTC/USDT feed. Data will appear shortly...', true);
     }
@@ -209,12 +215,12 @@ export class CryptoService {
       action: 'SubAdd',
       subs: ['0~Binance~BTC~USDT'],
     };
-    
+
     try {
       this.ws.send(JSON.stringify(subscribeMsg));
       console.log('Subscription request sent successfully');
-      
-      // Informuj użytkownika, że czekamy na dane
+
+      // Update user about waiting for data
       if (this.onConnectionUpdate) {
         this.onConnectionUpdate('Connected', 'Subscription active. Waiting for first trade data...', true);
       }
@@ -235,14 +241,14 @@ export class CryptoService {
       this.reconnectTimer = null;
     }
 
-    // Dodaj status rozłączenia przed czyszczeniem
+    // Show disconnection status before cleanup
     if (this.isActive && this.onConnectionUpdate) {
       this.onConnectionUpdate('Disconnected', 'Connection closed', true);
     }
 
     this.isSubscribed = false;
     this.pendingSubscription = false;
-    
+
     if (this.connectionTimeout) {
       clearTimeout(this.connectionTimeout);
       this.connectionTimeout = null;
@@ -264,15 +270,16 @@ export class CryptoService {
       console.log('Stream is already active');
       return;
     }
-    
+
+    // Reset all states when starting
     this.isActive = true;
     this.isSubscribed = false;
     this.pendingSubscription = false;
     this.reconnectAttempts = 0;
     this.overlayManuallyClosed = false;
-    
+
     this.updateConnectionStatus('Initializing', 'Starting connection...', true);
-    
+
     this.setupWebSocket();
   }
 
@@ -280,9 +287,9 @@ export class CryptoService {
     console.log('Stopping stream...');
     this.isActive = false;
     this.overlayManuallyClosed = false;
-    
+
     this.updateConnectionStatus('Disconnected', 'Stream stopped', false);
-    
+
     this.cleanup();
   }
 

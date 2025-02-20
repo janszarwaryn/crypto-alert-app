@@ -20,11 +20,10 @@ import { Order } from '../types';
 import { SettingsDialog } from '../components/SettingsDialog';
 import SettingsIcon from '@mui/icons-material/Settings';
 
-// Stałe kolory dla alertów
 const ALERT_COLORS = {
-  CHEAP: '#ff9800',    // Pomarańczowy
-  SOLID: '#4caf50',    // Zielony
-  BIG: '#2196f3'       // Niebieski
+  CHEAP: '#ff9800',
+  SOLID: '#4caf50',
+  BIG: '#2196f3'
 };
 
 interface AlertTableProps {
@@ -47,7 +46,6 @@ const AlertTable: React.FC<AlertTableProps> = ({
   const theme = useTheme();
   const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
 
-  // Filtruj alerty według progu i czasu
   const filteredAlerts = alerts.filter(alert => {
     const isRecent = alert.timestamp > oneMinuteAgo;
     const value = unit === '$' ? alert.usdValue : alert.btcValue;

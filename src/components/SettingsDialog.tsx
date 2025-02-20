@@ -37,7 +37,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose })
   const handleChange = (field: keyof typeof settings) => (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     
-    // Walidacja i parsowanie wartości
+    // Allow empty input or decimal point
     if (value === '' || value === '.') {
       setLocalSettings(prev => ({ ...prev, [field]: value }));
       return;
@@ -50,7 +50,7 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose })
   };
 
   const handleSave = () => {
-    // Upewnij się, że wszystkie wartości są liczbami przed zapisem
+    // Ensure all values are numbers before saving
     const finalSettings = {
       cheapThreshold: typeof localSettings.cheapThreshold === 'string' 
         ? parseFloat(localSettings.cheapThreshold) || DEFAULT_SETTINGS.cheapThreshold 
@@ -61,23 +61,23 @@ export const SettingsDialog: React.FC<SettingsDialogProps> = ({ open, onClose })
       bigThreshold: typeof localSettings.bigThreshold === 'string'
         ? parseFloat(localSettings.bigThreshold) || DEFAULT_SETTINGS.bigThreshold
         : localSettings.bigThreshold,
-      apiKey: localSettings.apiKey // Zachowaj aktualny klucz API
+      apiKey: localSettings.apiKey // Keep current API key
     };
     
-    // Aktualizuj ustawienia
+    // Update settings in context
     updateSettings(finalSettings);
     
-    // Zamknij dialog od razu
+    // Close dialog immediately
     onClose();
 
-    // Pokaż komunikat o aktualizacji ustawień
+    // Show settings updated message
     setConnectionStatus({
       isLoading: true,
       status: 'Live',
       substatus: 'Real-time trade data stream is now active'
     });
 
-    // Ukryj overlay po 1 sekundzie
+    // Hide overlay after delay
     setTimeout(() => {
       setConnectionStatus({
         isLoading: false,
